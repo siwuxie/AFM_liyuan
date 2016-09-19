@@ -1,0 +1,69 @@
+CC = gcc-linux
+C_FLAG=-D_DEBUG_ -Wall
+FLAG_7489 = -D_CONST_DELAY_ -D_HT7489_
+FLAG_511P = -D_CONST_DELAY_ -D_PM511P_
+LINK_FLAG=-lm -lpthread
+
+GENERAL_OBG = ./debug/main.o ./debug/dispatch_cmd.o ./debug/freqScanThread.o ./debug/scanThread.o \
+    ./debug/forceCurveThread.o ./debug/laserThread.o ./debug/motorThread.o ./debug/closeloop.o \
+    ./debug/restart.o ./debug/serial_port.o
+
+
+all : ht7489Server-debug pm511pServer-debug
+
+ht7489Server-debug : $(GENERAL_OBG) ./debug/ht7489.o ./debug/new_dds_DDFS.o ./debug/new_dds_IO.o 
+	$(CC) $(C_FLAG) -o ht7489Server-debug -lm -lpthread $(GENERAL_OBG) ./debug/ht7489.o ./debug/new_dds_DDFS.o ./debug/new_dds_IO.o
+
+pm511pServer-debug : $(GENERAL_OBG) ./debug/pm511p.o ./debug/pm511p_IO.o  ./debug/new_dds_DDFS.o
+	$(CC) $(C_FLAG) -o pm511pServer-debug -lm -lpthread $(GENERAL_OBG) ./debug/pm511p.o ./debug/pm511p_IO.o  ./debug/new_dds_DDFS.o
+
+./debug/main.o : main.c afm_comm.h work_thread.h hardware.h restart.h
+	$(CC) $(C_FLAG) -c main.c -o ./debug/main.o
+
+./debug/dispatch_cmd.o : dispatch_cmd.c work_thread.h 
+	$(CC) $(C_FLAG) -c dispatch_cmd.c -o ./debug/dispatch_cmd.o
+
+./debug/freqScanThread.o : freqScanThread.c work_thread.h hardware.h
+	$(CC) $(C_FLAG) -c freqScanThread.c -o ./debug/freqScanThread.o
+
+./debug/scanThread.o : scanThread.c work_thread.h hardware.h
+	$(CC) $(C_FLAG) -c scanThread.c -o ./debug/scanThread.o
+	
+		
+./debug/forceCurveThread.o : forceCurveThread.c work_thread.h hardware.h
+	$(CC) $(C_FLAG) -c forceCurveThread.c -o ./debug/forceCurveThread.o
+
+./debug/laserThread.o : laserThread.c work_thread.h hardware.h
+	$(CC) $(C_FLAG) -c laserThread.c -o ./debug/laserThread.o
+
+./debug/motorThread.o : motorThread.c work_thread.h hardware.h
+	$(CC) $(C_FLAG) -c motorThread.c -o ./debug/motorThread.o
+
+./debug/closeloop.o : closeloop.c closeloop.h afm_comm.h hardware.h
+	$(CC) $(C_FLAG) -c closeloop.c -o ./debug/closeloop.o
+
+./debug/ht7489.o : ht7489.c hardware.h
+	$(CC) $(C_FLAG) $(FLAG_7489) -c ht7489.c -o ./debug/ht7489.o
+./debug/pm511p.o : pm511p.c hardware.h
+	$(CC) $(C_FLAG) $(FLAG_511P) -c pm511p.c -o ./debug/pm511p.o
+
+./debug/pm511p_IO.o : pm511p_IO.c hardware.h
+	$(CC) $(C_FLAG) $(FLAG_511P) -c pm511p_IO.c -o ./debug/pm511p_IO.o
+	
+./debug/new_dds_DDFS.o : new_dds_DDFS.c hardware.h
+	$(CC) $(C_FLAG) -c new_dds_DDFS.c -o ./debug/new_dds_DDFS.o
+
+./debug/new_dds_IO.o : new_dds_IO.c hardware.h
+	$(CC) $(C_FLAG) -c new_dds_IO.c -o ./debug/new_dds_IO.o
+
+./debug/restart.o : restart.c restart.h
+	$(CC) $(C_FLAG) -c restart.c -o ./debug/restart.o
+ 
+./debug/serial_port.o : serial_port.c serial_port.h
+	$(CC) $(C_FLAG) -c serial_port.c -o ./debug/serial_port.o
+	
+clean :
+	rm -fv ./debug/*.o;	rm -v ht7489Server-debug pm511pServer-debug
+
+clean.bak :
+	rm -fv *.bak
